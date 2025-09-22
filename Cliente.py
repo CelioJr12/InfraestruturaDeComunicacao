@@ -21,8 +21,10 @@ while True:
 
     carga_util = mensagem[:int(tamanho_max)]
 
-    client_socket.sendall(carga_util.encode())
-    resposta = client_socket.recv(int(tamanho_max)).decode()
-    print(f'Resposta do servidor: {resposta}')
+    for i in range(0, len(carga_util), 4):
+        bloco = carga_util[i:i+4]
+        client_socket.sendall(bloco.encode())
+        resposta = client_socket.recv(4).decode()
+        print(f'Resposta do servidor: {resposta}')
 
 client_socket.close()
