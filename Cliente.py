@@ -7,9 +7,9 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((HOST, PORT))
 
 modo_operacao = 'texto'
+tamanho_max = 50
 tamanho_min = 30
 tamanho_pacote = 4
-tamanho_max= 50
 handshake = f'{modo_operacao}:{tamanho_max}'
 client_socket.sendall(handshake.encode())
 
@@ -18,6 +18,7 @@ print(f'Resposta do servidor: {data}')
 
 while True:
     mensagem = input(f'Digite uma mensagem (min {tamanho_min} e max {tamanho_max} de caracteres, vazio para sair): ')
+
     if mensagem == '':
         break
     elif len(mensagem) >= 30 and len(mensagem) <=50:
