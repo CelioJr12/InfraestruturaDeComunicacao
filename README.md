@@ -1,6 +1,9 @@
-README
 
 ## Como executar
+
+### Baixe a lib
+
+`pip install pycryptodome`
 
 Servidor
 
