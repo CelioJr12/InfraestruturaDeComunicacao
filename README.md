@@ -85,6 +85,3 @@ O Cliente solicitará as seguintes informações:
 | Modo de Confirmação    | Escolha o protocolo de RDT.                                               | gobackn ou selecionado                |
 | Pacotes com Falha      | Digite os números de sequência (SeqNum) que terão o checksum alterado para forçar a falha (separe por vírgula). | 2,5,7 (ou deixe vazio)               |
 | Mensagem               | Digite a mensagem a ser transmitida.                                      | Qualquer mensagem com comprimento válido. |
-
-
-
