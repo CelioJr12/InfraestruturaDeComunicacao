@@ -1,50 +1,75 @@
+# 📄 README: Protocolo de Transporte RDT com Criptografia e Checksum
 
-## Como executar
+---
 
-### Baixe a lib
+## 🚀 1. Introdução ao Projeto
 
-`pip install pycryptodome`
+Este projeto implementa um sistema básico de **Transferência Confiável de Dados (RDT)** sobre o protocolo UDP, utilizando Python. O objetivo é simular as camadas de transporte e aplicação, garantindo a entrega correta e na ordem de uma mensagem fragmentada, mesmo na presença de erros (perda de pacotes e erros de checksum).
 
-Servidor
+### 🔑 Recursos de Aplicação
 
-`python Servidor.py`
+* **Fragmentação:** Mensagens são quebradas em fragmentos de 4 bytes (caracteres).
+* **Criptografia Simples:** Um esquema de criptografia XOR/Permutação é aplicado a cada payload de 4 bytes.
+* **Verificação de Integridade:** Um algoritmo de **Checksum Modulo-256** é usado para detectar erros de bits.
 
+---
 
-Cliente
+## 🔬 2. Relatório Técnico e Protocolo de Aplicação
 
-`python Cliente.py`
+### 2.1 Protocolo de Transporte (RDT)
 
+O sistema suporta dois modos de transferência, selecionados pelo Cliente no início da comunicação:
 
-`O cliente pedirá o modo de operação (GBN ou SR).`
+* **Go-Back-N (GBN):** Utiliza uma **janela deslizante ($W=5$)**. O Servidor envia **NAK** para o pacote fora de ordem (`expected_seq`). Um NAK recebido ou um **Timeout** no Cliente faz com que **toda a janela** seja retransmitida a partir da base (`base`). 
+* **Selective Repeat (SR):** Utiliza uma **janela deslizante ($W=5$)** e permite o armazenamento de pacotes fora de ordem no Servidor. O Servidor envia **ACK** para pacotes corretos e **NAK** apenas para pacotes específicos faltantes. O Cliente retransmite **apenas** os pacotes solicitados (via NAK) ou aqueles que atingiram o timeout. 
 
-## Como enviar mensagens
+| Característica | Go-Back-N (GBN) | Selective Repeat (SR) |
+| :---: | :---: | :---: |
+| **Janela de Envio** | $W=5$ | $W=5$ |
+| **Avanço da Janela** | Cumulativo (base avança apenas com ACK da base) | Individual (base avança com ACK da base) |
+| **Retransmissão** | Pacotes perdidos **e** subsequentes. | Somente pacotes perdidos/solicitados por NAK. |
 
-`O cliente aceita mensagens entre 30 e 50 bytes.`
+### 2.2 Estrutura do Pacote de Dados (DATA)
 
-`A mensagem será fragmentada e enviada automaticamente.`
+O pacote de dados é transmitido em formato string (separado por `|`):
 
-`O servidor monta tudo e exibe o resultado no final.`
+$$\text{DATA}| \text{SeqNum}| \text{TotalPacotes}| \text{PayloadCriptografado}| \text{Checksum}$$
 
-## Como testar erros
+* **SeqNum:** Número de sequência do pacote.
+* **TotalPacotes:** Número total de fragmentos da mensagem.
+* **PayloadCriptografado:** Carga útil de 4 bytes, após criptografia.
+* **Checksum:** Valor Módulo-256 calculado sobre o **Payload de 4 bytes com padding**.
 
-Você pode simular erros editando temporariamente o código, por exemplo:
+### 2.3 Detalhes da Criptografia e Integridade
 
-`alterar o checksum antes de enviar um fragmento`
+#### 🛡️ Criptografia Manual
 
-`comentar um envio para gerar timeout`
+Cada fragmento de 4 caracteres é criptografado usando a chave fixa `MANUAL_KEY = b'COMP'`. O processo envolve:
 
-`enviar o mesmo fragmento duas vezes`
+1.  **Padding (`.ljust(4)`):** Fragmentos incompletos são preenchidos com espaços.
+2.  **Checksum:** O valor de integridade é calculado sobre o payload de 4 bytes **já com o padding**.
+3.  **Criptografia:** Os 4 bytes são submetidos a uma operação **XOR** com a chave seguida por uma **Permutação** de bytes.
 
-`O servidor responderá com NAK ou ACK dependendo do caso.`
+#### ✅ Checksum
 
-## Recursos implementados
+O algoritmo de Checksum é uma soma simples dos valores ASCII (ord) de todos os caracteres do payload, módulo 256. É fundamental que o cálculo inclua o padding.
 
-`modos GBN e SR`
+$$C = \left(\sum_{c \in \text{payload}} \text{ord}(c)\right) \pmod{256}$$
 
-`checksum para integridade`
+---
 
-`retransmissão com timeout`
+## 📖 3. Manual de Utilização
 
-`janela de 1 a 5, definida pelo servidor`
+### 3.1 Pré-requisitos
 
-`criptografia opcional com Diffie Hellman e AES`
+* Python 3.x instalado.
+* Os arquivos `Cliente.py` e `Server.py` devem estar no mesmo diretório.
+
+### 3.2 Execução
+
+É obrigatório iniciar o **Servidor** primeiro e, em seguida, o **Cliente**.
+
+#### Passo 1: Iniciar o Servidor
+
+```bash
+python Server.py
