@@ -1,4 +1,4 @@
-# 📄 README: Protocolo de Transporte RDT com Criptografia e Checksum
+# 📄 README: Trabalho I da Disciplina de Infraestrutura de Comunicação (RSD)
 
 ---
 
@@ -71,5 +71,20 @@ $$C = \left(\sum_{c \in \text{payload}} \text{ord}(c)\right) \pmod{256}$$
 
 #### Passo 1: Iniciar o Servidor
 
-```bash
-python Server.py
+`python Server.py`
+
+#### Passo 2: Iniciar o Cliente
+
+`python Cliente.py`
+
+O Cliente solicitará as seguintes informações:
+
+| Configuração           | Descrição                                                                 | Exemplo                               |
+|------------------------|--------------------------------------------------------------------------|--------------------------------------|
+| Tamanho Máximo da Mensagem | Limite superior para a mensagem (mínimo 30 chars).                     | 60                                   |
+| Modo de Confirmação    | Escolha o protocolo de RDT.                                               | gobackn ou selecionado                |
+| Pacotes com Falha      | Digite os números de sequência (SeqNum) que terão o checksum alterado para forçar a falha (separe por vírgula). | 2,5,7 (ou deixe vazio)               |
+| Mensagem               | Digite a mensagem a ser transmitida.                                      | Qualquer mensagem com comprimento válido. |
+
+
+
